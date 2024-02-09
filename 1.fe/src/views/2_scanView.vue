@@ -163,8 +163,13 @@ export default {
         return false
       }
     },
+    async chkProduct(a) {},
     async inserthist(a) {
       const r = await this.$post('/inserthist', { params: a })
+      console.log(r)
+    },
+    async updateorder(a) {
+      const r = await this.$post('/updateorder', { params: a })
       console.log(r)
     },
     goToDetail(itm, date, trail) {
@@ -217,7 +222,7 @@ export default {
             TMP_ITMNO = TMP_ITMNO.slice(0, 5) + '-' + TMP_ITMNO.slice(5)
             // 아이템번호가 아이템마스터에 있는지 체크
             if (await this.chkITMNO(TMP_ITMNO)) {
-              alert('Not in Item Master')
+              alert('No Item - scan item is not in Item Master')
               return
             }
           } else if (a.slice(0, 2) === '7Q') {
@@ -225,7 +230,7 @@ export default {
             TMP_QTY = Number(TMP_QTY)
             // Label QTY 체크
             if (!TMP_QTY > 0) {
-              alert('Label QTY Error')
+              alert('QTY Error - please check scan QTY is correct')
               return
             }
           } else if (a.slice(0, 1) === 'D') {
@@ -259,29 +264,41 @@ export default {
         console.log('list data', selectedData)
         // 스캔아이템 번호가 쉬핑오더 리스트에 있는지 체크
         if (selectedData.length === 0) {
-          alert('Scan Item does not in the List')
+          alert('Not in List - scan Item does not match with Shipping Order')
           return
         }
         // 리스트 데이터를 selectedData에 저장
         selectedData = selectedData[0]
         console.log(selectedData.ASN_NO)
 
+        // Overcharge 체크
+        if (selectedData.ORD_QTY < selectedData.SCAN_QTY + tempData.TMP_QTY) {
+          await this.inserthist([selectedData, tempData, today1, today2, 2])
+          alert('Over Charge - please check Scan QTY')
+          return
+        }
         // ASN No 체크
         if (selectedData.ASN_NO === '') {
           await this.inserthist([selectedData, tempData, today1, today2, 3])
-          alert('NO ASN')
+          alert('NO ASN - please check Shipping Order')
           return
         }
         // Duplicate 체크
         if (await this.chkDup(tempData.TMP_SERNO)) {
           await this.inserthist([selectedData, tempData, today1, today2, 4])
-          alert('Scan pallet is duplicate')
+          alert('Duplicate - this pallet is already scanned')
           return
         }
         // Customer 체크
         if (selectedData.CUST_CD !== tempData.TMP_CUST) {
           await this.inserthist([selectedData, tempData, today1, today2, 5])
           alert('Customer not match')
+          return
+        }
+        // 제품바코드 체크
+        if (await this.chkProduct()) {
+          await this.inserthist([selectedData, tempData, today1, today2, 6])
+          alert('Product Barcode Error - please check product')
           return
         }
         // 고객사PO 체크
@@ -291,9 +308,16 @@ export default {
           return
         }
         console.log('hello')
+        await this.inserthist([selectedData, tempData, today1, today2, 1])
+        if (selectedData.ORD_QTY > selectedData.SCAN_QTY + tempData.TMP_QTY) {
+          await this.updateorder()
+        }
+
         this.scanValue = ''
       } else {
+        alert('Label Error - please check pallet label')
         console.log('no', this.scanValue.slice(0, 7))
+        this.scanValue = ''
       }
     }
   }

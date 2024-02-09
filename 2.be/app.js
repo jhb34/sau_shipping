@@ -192,3 +192,25 @@ app.post("/inserthist", (req, res) => {
     }
   );
 });
+app.post("/updateorder", (req, res) => {
+  const { params } = req.body;
+  console.log(params);
+  const selectd = params[0];
+  const scand = params[1];
+  const today1 = params[2];
+  const today2 = params[3];
+  const code = params[4];
+  const request = new sql.Request();
+  request.query(
+    `update SAL_ORDER set SCAN_QTY=$S,SCAN_BOX=$S,SCAN_HM='$S',NOW_ST='$S', where "
+      `,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+        return;
+      }
+      res.send(result);
+    }
+  );
+});
