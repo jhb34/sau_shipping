@@ -103,6 +103,72 @@
           </tbody>
         </table>
       </div>
+      <!-- Button trigger modal -->
+      <button
+        type="button"
+        class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#staticBackdrop"
+      >
+        Launch static backdrop modal
+      </button>
+
+      <!-- Modal -->
+      <div
+        class="modal fade"
+        id="staticBackdrop"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false"
+        tabindex="-1"
+        aria-labelledby="staticBackdropLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="staticBackdropLabel">
+                Part Scan
+              </h1>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="input-group mt-2">
+                <span class="input-group-text col-3" style="font-size: 2vh"
+                  >Part No.</span
+                >
+                <div class="form-control">
+                  <span style="font-size: 2vh">{{}}</span>
+                </div>
+              </div>
+              <div class="input-group mt-1">
+                <span
+                  class="input-group-text col-3 text-center"
+                  style="font-size: 2vh"
+                  >Tag No.</span
+                >
+                <div class="form-control">
+                  <span style="font-size: 2vh">{{ input.trail }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="button" class="btn btn-primary">Understood</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -194,6 +260,22 @@ export default {
         pad2(a.getSeconds())
       )
     },
+    getDate3(a) {
+      const pad2 = (n) => (n < 10 ? '0' : '') + n
+      return (
+        a.getFullYear() +
+        '-' +
+        pad2(a.getMonth() + 1) +
+        '-' +
+        pad2(a.getDate()) +
+        ' ' +
+        pad2(a.getHours()) +
+        ':' +
+        pad2(a.getMinutes()) +
+        ':' +
+        pad2(a.getSeconds())
+      )
+    },
     getDate2(a) {
       return (
         25569.0 +
@@ -210,10 +292,13 @@ export default {
       const scanValue = this.scanValue.toUpperCase()
       // const scanValue = this.scanValue.toUpperCase()
       const tempData = {}
+      // 날짜변환
       const today1 = this.getDate1(new Date())
       const today2 = this.getDate2(new Date())
+      const today3 = this.getDate3(new Date())
       console.log('today1', today1)
       console.log('today2', today2)
+      console.log('today3', today3)
       if (scanValue.slice(0, 6) === '[)>*06') {
         const datas = scanValue.split(':')
         for (const a of datas) {
@@ -223,6 +308,7 @@ export default {
             // 아이템번호가 아이템마스터에 있는지 체크
             if (await this.chkITMNO(TMP_ITMNO)) {
               alert('No Item - scan item is not in Item Master')
+              this.refresh()
               return
             }
           } else if (a.slice(0, 2) === '7Q') {
@@ -231,6 +317,7 @@ export default {
             // Label QTY 체크
             if (!TMP_QTY > 0) {
               alert('QTY Error - please check scan QTY is correct')
+              this.refresh()
               return
             }
           } else if (a.slice(0, 1) === 'D') {
@@ -265,6 +352,7 @@ export default {
         // 스캔아이템 번호가 쉬핑오더 리스트에 있는지 체크
         if (selectedData.length === 0) {
           alert('Not in List - scan Item does not match with Shipping Order')
+          this.refresh()
           return
         }
         // 리스트 데이터를 selectedData에 저장
@@ -275,45 +363,66 @@ export default {
         if (selectedData.ORD_QTY < selectedData.SCAN_QTY + tempData.TMP_QTY) {
           await this.inserthist([selectedData, tempData, today1, today2, 2])
           alert('Over Charge - please check Scan QTY')
+          this.refresh()
           return
         }
         // ASN No 체크
         if (selectedData.ASN_NO === '') {
           await this.inserthist([selectedData, tempData, today1, today2, 3])
           alert('NO ASN - please check Shipping Order')
+          this.refresh()
           return
         }
         // Duplicate 체크
         if (await this.chkDup(tempData.TMP_SERNO)) {
           await this.inserthist([selectedData, tempData, today1, today2, 4])
           alert('Duplicate - this pallet is already scanned')
+          this.refresh()
           return
         }
         // Customer 체크
         if (selectedData.CUST_CD !== tempData.TMP_CUST) {
           await this.inserthist([selectedData, tempData, today1, today2, 5])
           alert('Customer not match')
+          this.refresh()
           return
         }
-        // 제품바코드 체크
-        if (await this.chkProduct()) {
-          await this.inserthist([selectedData, tempData, today1, today2, 6])
-          alert('Product Barcode Error - please check product')
-          return
-        }
+        // // 제품바코드 체크
+        // if (await this.chkProduct()) {
+        //   await this.inserthist([selectedData, tempData, today1, today2, 6])
+        //   alert('Product Barcode Error - please check product')
+        //   return
+        // }
         // 고객사PO 체크
         if (await this.chkPO(selectedData)) {
           await this.inserthist([selectedData, tempData, today1, today2, 7])
           alert('PO not match')
+          this.refresh()
           return
         }
         console.log('hello')
         await this.inserthist([selectedData, tempData, today1, today2, 1])
         if (selectedData.ORD_QTY > selectedData.SCAN_QTY + tempData.TMP_QTY) {
-          await this.updateorder()
+          await this.updateorder([
+            selectedData,
+            selectedData.SCAN_QTY + tempData.TMP_QTY,
+            selectedData.SCAN_BOX + 1,
+            today3,
+            1
+          ])
+        } else if (
+          (selectedData.ORD_QTY = selectedData.SCAN_QTY + tempData.TMP_QTY)
+        ) {
+          await this.updateorder([
+            selectedData,
+            selectedData.SCAN_QTY + tempData.TMP_QTY,
+            selectedData.SCAN_BOX + 1,
+            today3,
+            2
+          ])
         }
-
         this.scanValue = ''
+        this.refresh()
       } else {
         alert('Label Error - please check pallet label')
         console.log('no', this.scanValue.slice(0, 7))

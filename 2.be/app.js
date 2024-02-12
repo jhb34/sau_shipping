@@ -117,7 +117,7 @@ app.post("/chkpo", (req, res) => {
   // const cust = params[1].trim();
   const request = new sql.Request();
   request.query(
-    `select top 100 * from  TB_PO_INFO where PART_NO='${a}' and CUST_CODE='${a}'
+    `select top 100 * from  TB_PO_INFO where PART_NO='${a.ITMNO}' and CUST_CODE='${a.CUST_CD}'
       `,
     (err, result) => {
       if (err) {
@@ -196,20 +196,20 @@ app.post("/updateorder", (req, res) => {
   const { params } = req.body;
   console.log(params);
   const selectd = params[0];
-  const scand = params[1];
-  const today1 = params[2];
-  const today2 = params[3];
+  const scanqty = params[1];
+  const scanbox = params[2];
+  const today3 = params[3];
   const code = params[4];
   const request = new sql.Request();
   request.query(
-    `update SAL_ORDER set SCAN_QTY=$S,SCAN_BOX=$S,SCAN_HM='$S',NOW_ST='$S', where "
-      `,
+    `update SAL_ORDER set SCAN_QTY=${scanqty},SCAN_BOX=${scanbox},SCAN_HM='${today3}',NOW_ST='${code}' where SAL_YMD='${selectd.SAL_YMD}' and TRAILER_NO='${selectd.TRAILER_NO}'and ITMNO='${selectd.ITMNO}'      `,
     (err, result) => {
       if (err) {
         console.log(err);
         res.sendStatus(500);
         return;
       }
+      console.log(result);
       res.send(result);
     }
   );
