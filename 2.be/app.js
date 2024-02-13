@@ -150,6 +150,29 @@ app.post("/chkitmno", (req, res) => {
   );
 });
 
+app.post("/isshaft", (req, res) => {
+  const a = req.body.params;
+  console.log(a);
+  const scan = a[0];
+  const code = a[1];
+  console.log(scan.TMP_ITMNO);
+  console.log(code);
+  const request = new sql.Request();
+  request.query(
+    `select top 100 * from ITM_MST where ITMNO='${scan.TMP_ITMNO}' and GUB_CD='${code}'
+      `,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+        return;
+      }
+      console.log(result);
+      res.send(result);
+    }
+  );
+});
+
 app.post("/getscandetail", (req, res) => {
   const { params } = req.body;
   const date = params[0].trim();

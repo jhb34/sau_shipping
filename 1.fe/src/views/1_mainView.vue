@@ -160,7 +160,7 @@ export default {
   created() {},
   mounted() {
     this.setDate()
-    this.fullscreen()
+    // this.fullscreen()
   },
   unmounted() {},
   methods: {

@@ -228,10 +228,10 @@ export default {
   },
   setup() {},
   created() {
-    this.input = this.$route.query
+    // this.input = this.$route.query
   },
   mounted() {
-    this.getData()
+    // this.getData()
   },
   unmounted() {},
   methods: {
@@ -489,4 +489,39 @@ export default {
     }
   }
 }
+
+// {/* <input type="text" id="tacos" />
+//     <button onclick="f()">code</button>
+//     <script>
+//       let barcode = "";
+//       let barcode1 = "";
+//       let barcode2 = "";
+//       document
+//         .getElementById("tacos")
+//         .addEventListener("keypress", function (e) {
+//           // if (e.charCode === 29) {
+//           //   barcode += "{GS}";
+//           // } else if (e.charCode === 30) {
+//           //   barcode += "{RS}";
+//           // } else if (e.charCode === 4) {
+//           //   barcode += "{EOT}";
+//           // } else if (e.charCode === 13) {
+//           //   return;
+//           // } else if (e.charCode === 32) {
+//           //   return;
+//           // } else {
+//           //   barcode += String.fromCharCode(e.charCode);
+//           // }
+//           // barcode1 += e.key;
+//           // barcode2 += String.fromCharCode(e.charCode);
+//           console.log(e.charCode);
+//           console.log(e.key);
+//           console.log(String.fromCharCode(e.charCode));
+//         });
+//       function f() {
+//         console.log(barcode);
+//         // console.log(barcode1);
+//         // console.log(barcode2);
+//       }
+//     // </script> */}
 </script>
