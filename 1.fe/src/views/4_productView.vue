@@ -17,7 +17,7 @@
         padding: 1vh;
       "
     >
-      Shipping Scan
+      Product Scan
       <font-awesome-icon
         icon="fa-solid fa-rotate"
         class="float-end"
@@ -33,46 +33,43 @@
     </div>
     <div class="container">
       <i class="bi-alarm" style="font-size: 2rem; color: cornflowerblue"></i>
-      <div class="input-group mt-2" @change="setDate">
-        <span class="input-group-text col-3" style="font-size: 2vh">Date</span>
+      <div class="input-group mt-2">
+        <span class="input-group-text col-3" style="font-size: 2vh"
+          >Item No.</span
+        >
         <div class="form-control">
-          <span style="font-size: 2vh"
-            >{{ input.date.substring(0, 4) }} /
-            {{ input.date.substring(4, 6) }} /
-            {{ input.date.substring(6, 9) }}</span
-          >
+          <span style="font-size: 2vh">{{ input.ITMNO }}</span>
         </div>
       </div>
       <div class="input-group mt-1">
         <span class="input-group-text col-3 text-center" style="font-size: 2vh"
-          >Trailer No.</span
+          >Pallet No.</span
         >
         <div class="form-control">
-          <span style="font-size: 2vh">{{ input.trail }}</span>
+          <span style="font-size: 2vh">{{ input.TMP_SERNO }}</span>
         </div>
       </div>
-      <p>scan: {{ scanValue }} <button @click="barcodeChk">a</button></p>
+      <p>scan: {{ barcode }}</p>
+      <p>input: {{ input }}</p>
+      <p>selectedData: {{ selectedData }}</p>
+      <button @click="barcodeChk" hidden>process</button>
+      <button @click="barcodeClear">clear</button>
       <div class="input-group mt-2">
         <input
           type="text"
           placeholder="Barcode Ready"
           v-model="scanValue"
+          @input="change"
           class="form-control"
-          readonly
+          @keyup.enter="onenter"
         />
       </div>
       <div class="mt-2" style="height: 50vh; overflow: auto">
         <table class="table table-hover">
           <thead class="table-primary">
             <tr style="position: sticky; top: 0">
-              <th>ASN Number</th>
-              <th>Item Number</th>
-              <th>Order Box</th>
-              <th>Order Qty</th>
-              <th>Scan Box</th>
-              <th>Scan HM</th>
-              <th>Scan Qty</th>
-              <th>Now ST</th>
+              <th>Part Label</th>
+              <th>Scan Time</th>
             </tr>
           </thead>
           <tbody>
@@ -104,115 +101,6 @@
           </tbody>
         </table>
       </div>
-      <!-- Button trigger modal -->
-      <button
-        type="button"
-        ref="btnModal"
-        class="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#staticBackdrop"
-      >
-        Launch static backdrop modal
-      </button>
-
-      <!-- Modal -->
-      <div
-        class="modal fade"
-        id="staticBackdrop"
-        data-bs-backdrop="static"
-        data-bs-keyboard="false"
-        tabindex="-1"
-        aria-labelledby="staticBackdropLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                Part Scan
-              </h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <div class="input-group mt-2">
-                <span class="input-group-text col-3" style="font-size: 2vh"
-                  >Part No.</span
-                >
-                <div class="form-control">
-                  <span style="font-size: 2vh">{{}}</span>
-                </div>
-              </div>
-              <div class="input-group mt-1">
-                <span
-                  class="input-group-text col-3 text-center"
-                  style="font-size: 2vh"
-                  >Tag No.</span
-                >
-                <div class="form-control">
-                  <span style="font-size: 2vh">{{ input.trail }}</span>
-                </div>
-              </div>
-              <p>
-                scan: {{ scanValue }} <button @click="barcodeChk">a</button>
-              </p>
-              <div class="input-group mt-2">
-                <input
-                  type="text"
-                  placeholder="Barcode Ready"
-                  v-model="scanValue"
-                  class="form-control"
-                />
-              </div>
-              <div class="mt-2" style="height: 50vh; overflow: auto">
-                <table class="table table-hover">
-                  <thead class="table-primary">
-                    <tr style="position: sticky; top: 0">
-                      <th>ASN Number</th>
-                      <th>Item Number</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr
-                      v-for="a in data2"
-                      :key="a"
-                      @click="goToDetail(a.ITMNO, a.SAL_YMD, a.TRAILER_NO)"
-                    >
-                      <td>{{ a.ASN_NO }}</td>
-                      <td>{{ a.ITMNO }}</td>
-                      <!-- <td>
-                <span v-if="a.NOW_ST === '0'" class="badge bg-warning text-dark"
-                  >Ready</span
-                >
-                <span
-                  v-else-if="a.NOW_ST === a.ORD_BOX"
-                  class="badge text-bg-danger"
-                  >Scanning</span
-                >
-                <span v-else class="badge text-bg-secondary">Complete</span>
-              </td> -->
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
-              <button type="button" class="btn btn-primary">Understood</button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -222,19 +110,54 @@ export default {
   data() {
     return {
       scanValue: '',
+      barcode: '',
+      scanData: [],
+      selectedData: [],
       input: {},
       data: []
     }
   },
   setup() {},
   created() {
-    // this.input = this.$route.query
+    this.input = this.$route.query
+    console.log(this.$route.query)
   },
   mounted() {
     // this.getData()
   },
   unmounted() {},
   methods: {
+    onenter() {
+      alert('enter')
+    },
+    change() {
+      // const asciiValues = [];
+      // for (let i = 0; i < this.scannerData.length; i++) {
+      //   const charCode = this.scannerData.charCodeAt(i);
+      //   asciiValues.push(charCode);
+      // }
+
+      for (let i = 0; i < this.scanValue.length; i++) {
+        const charCode = this.scanValue.charCodeAt(i)
+        if (charCode === 29) {
+          this.barcode += '{GS}'
+        } else if (charCode === 30) {
+          this.barcode += '{RS}'
+        } else if (charCode === 4) {
+          this.barcode += '{EOT}'
+        } else if (charCode === 13) {
+          alert('13')
+        } else if (charCode === 32) {
+          alert('32')
+        } else {
+          this.barcode += String.fromCharCode(charCode)
+        }
+      }
+    },
+    barcodeClear() {
+      this.barcode = ''
+      this.scanValue = ''
+    },
     async getData() {
       const r = await this.$post('/getlist', {
         params: [this.input.date, this.input.trail, this.input.cust]
@@ -492,7 +415,6 @@ export default {
 
 // {/* <input type="text" id="tacos" />
 //     <button onclick="f()">code</button>
-//     <script>
 //       let barcode = "";
 //       let barcode1 = "";
 //       let barcode2 = "";
@@ -523,5 +445,4 @@ export default {
 //         // console.log(barcode1);
 //         // console.log(barcode2);
 //       }
-//     // </script> */}
 </script>

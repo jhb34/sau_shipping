@@ -58,7 +58,6 @@
           placeholder="Barcode Ready"
           v-model="scanValue"
           class="form-control"
-          readonly
         />
       </div>
       <div class="mt-2" style="height: 50vh; overflow: auto">
@@ -291,8 +290,17 @@ export default {
       const r = await this.$post('/updateorder', { params: a })
       console.log('updateorder', r)
     },
-    goToDetail(itm, date, trail) {
-      this.$router.push({ path: '/scandetail', query: { itm, date, trail } })
+    // goToProduct(a, b, c) {
+    //   this.$router.push({
+    //     path: '/productscan',
+    //     query: { itmno: a, cust: b, tagno: c }
+    //   })
+    // },
+    goToProduct(a, b) {
+      this.$router.push({
+        path: '/productscan',
+        query: { ...a, ...b }
+      })
     },
     goToHome() {
       this.$router.push({
@@ -411,76 +419,81 @@ export default {
         // 리스트 데이터를 selectedData에 저장
         selectedData = selectedData[0]
         console.log(selectedData.ASN_NO)
-
-        // Overcharge 체크
-        if (selectedData.ORD_QTY < selectedData.SCAN_QTY + tempData.TMP_QTY) {
-          await this.inserthist([selectedData, tempData, today1, today2, 2])
-          alert('Over Charge - please check Scan QTY')
-          this.refresh()
-          return
-        }
-        // ASN No 체크
-        if (selectedData.ASN_NO === '') {
-          await this.inserthist([selectedData, tempData, today1, today2, 3])
-          alert('NO ASN - please check Shipping Order')
-          this.refresh()
-          return
-        }
-        // Duplicate 체크
-        if (await this.chkDup(tempData.TMP_SERNO)) {
-          await this.inserthist([selectedData, tempData, today1, today2, 4])
-          alert('Duplicate - this pallet is already scanned')
-          this.refresh()
-          return
-        }
-        // Customer 체크
-        if (selectedData.CUST_CD !== tempData.TMP_CUST) {
-          await this.inserthist([selectedData, tempData, today1, today2, 5])
-          alert('Customer not match')
-          this.refresh()
-          return
-        }
-        // 제품바코드 체크
-        // if (await this.isShaft([tempData, 'A'])) {
-        //   this.$refs.btnModal.click()
-        // if (await this.chkProduct()) {
-        //   console.log('hello')
-        // } else {
-        //   await this.inserthist([selectedData, tempData, today1, today2, 6])
-        //   alert('Product Barcode Error - please check product')
+        // this.goToProduct(
+        //   selectedData.ITMNO,
+        //   selectedData.CUST_CD,
+        //   tempData.TMP_SERNO
+        // )
+        this.goToProduct(selectedData, tempData)
+        // // Overcharge 체크
+        // if (selectedData.ORD_QTY < selectedData.SCAN_QTY + tempData.TMP_QTY) {
+        //   await this.inserthist([selectedData, tempData, today1, today2, 2])
+        //   alert('Over Charge - please check Scan QTY')
+        //   this.refresh()
         //   return
         // }
+        // // ASN No 체크
+        // if (selectedData.ASN_NO === '') {
+        //   await this.inserthist([selectedData, tempData, today1, today2, 3])
+        //   alert('NO ASN - please check Shipping Order')
+        //   this.refresh()
+        //   return
         // }
-        // 고객사PO 체크
-        if (await this.chkPO(selectedData)) {
-          await this.inserthist([selectedData, tempData, today1, today2, 7])
-          alert('PO not match')
-          this.refresh()
-          return
-        }
-        console.log('chk all clear')
-        // await this.inserthist([selectedData, tempData, today1, today2, 1])
-        // if (selectedData.ORD_QTY > selectedData.SCAN_QTY + tempData.TMP_QTY) {
-        //   await this.updateorder([
-        //     selectedData,
-        //     selectedData.SCAN_QTY + tempData.TMP_QTY,
-        //     selectedData.SCAN_BOX + 1,
-        //     today3,
-        //     1
-        //   ])
-        // } else if (
-        //   (selectedData.ORD_QTY = selectedData.SCAN_QTY + tempData.TMP_QTY)
-        // ) {
-        //   await this.updateorder([
-        //     selectedData,
-        //     selectedData.SCAN_QTY + tempData.TMP_QTY,
-        //     selectedData.SCAN_BOX + 1,
-        //     today3,
-        //     2
-        //   ])
+        // // Duplicate 체크
+        // if (await this.chkDup(tempData.TMP_SERNO)) {
+        //   await this.inserthist([selectedData, tempData, today1, today2, 4])
+        //   alert('Duplicate - this pallet is already scanned')
+        //   this.refresh()
+        //   return
         // }
-        this.scanValue = ''
-        // this.refresh()
+        // // Customer 체크
+        // if (selectedData.CUST_CD !== tempData.TMP_CUST) {
+        //   await this.inserthist([selectedData, tempData, today1, today2, 5])
+        //   alert('Customer not match')
+        //   this.refresh()
+        //   return
+        // }
+        // // 제품바코드 체크
+        // // if (await this.isShaft([tempData, 'A'])) {
+        // //   this.$refs.btnModal.click()
+        // // if (await this.chkProduct()) {
+        // //   console.log('hello')
+        // // } else {
+        // //   await this.inserthist([selectedData, tempData, today1, today2, 6])
+        // //   alert('Product Barcode Error - please check product')
+        // //   return
+        // // }
+        // // }
+        // // 고객사PO 체크
+        // if (await this.chkPO(selectedData)) {
+        //   await this.inserthist([selectedData, tempData, today1, today2, 7])
+        //   alert('PO not match')
+        //   this.refresh()
+        //   return
+        // }
+        // console.log('chk all clear')
+        // // await this.inserthist([selectedData, tempData, today1, today2, 1])
+        // // if (selectedData.ORD_QTY > selectedData.SCAN_QTY + tempData.TMP_QTY) {
+        // //   await this.updateorder([
+        // //     selectedData,
+        // //     selectedData.SCAN_QTY + tempData.TMP_QTY,
+        // //     selectedData.SCAN_BOX + 1,
+        // //     today3,
+        // //     1
+        // //   ])
+        // // } else if (
+        // //   (selectedData.ORD_QTY = selectedData.SCAN_QTY + tempData.TMP_QTY)
+        // // ) {
+        // //   await this.updateorder([
+        // //     selectedData,
+        // //     selectedData.SCAN_QTY + tempData.TMP_QTY,
+        // //     selectedData.SCAN_BOX + 1,
+        // //     today3,
+        // //     2
+        // //   ])
+        // // }
+        // this.scanValue = ''
+        // // this.refresh()
       } else {
         alert('Label Error - please check pallet label')
         console.log('no', this.scanValue.slice(0, 7))
