@@ -17,7 +17,7 @@
         padding: 1vh;
       "
     >
-      Product Scan
+      PALLET SCAN
       <font-awesome-icon
         icon="fa-solid fa-rotate"
         class="float-end"
@@ -33,43 +33,60 @@
     </div>
     <div class="container">
       <i class="bi-alarm" style="font-size: 2rem; color: cornflowerblue"></i>
-      <div class="input-group mt-2">
-        <span class="input-group-text col-3" style="font-size: 2vh"
-          >Item No.</span
-        >
+      <div class="input-group mt-2" @change="setDate">
+        <span class="input-group-text col-3" style="font-size: 2vh">Date</span>
         <div class="form-control">
-          <span style="font-size: 2vh">{{ input.ITMNO }}</span>
+          <span style="font-size: 2vh"
+            >{{ input.date.substring(0, 4) }} /
+            {{ input.date.substring(4, 6) }} /
+            {{ input.date.substring(6, 9) }}</span
+          >
         </div>
       </div>
       <div class="input-group mt-1">
         <span class="input-group-text col-3 text-center" style="font-size: 2vh"
-          >Pallet No.</span
+          >Trailer No.</span
         >
         <div class="form-control">
-          <span style="font-size: 2vh">{{ input.TMP_SERNO }}</span>
+          <span style="font-size: 2vh">{{ input.trail }}</span>
         </div>
       </div>
-      <p>scan: {{ barcode }}</p>
-      <p>input: {{ input }}</p>
-      <p>selectedData: {{ selectedData }}</p>
-      <button @click="barcodeChk" hidden>process</button>
-      <button @click="barcodeClear">clear</button>
-      <div class="input-group mt-2">
+      <p>scan: {{ scanValue }} <button @click="barcodeChk">a</button></p>
+      <div class="input-group mt-1" v-if="allchecked">
+        <span class="input-group-text col-4 text-center" style="font-size: 2vh"
+          >Container No.</span
+        >
+        <input type="text" class="form-control" v-model="containernumber" />
+        <button
+          class="btn btn-outline-secondary"
+          @click="savecontainer"
+          :disabled="containernumber === ''"
+        >
+          Save
+        </button>
+      </div>
+      <div class="input-group mt-2" v-else>
         <input
           type="text"
-          placeholder="Barcode Ready"
+          placeholder="Scan Here"
           v-model="scanValue"
-          @input="change"
           class="form-control"
-          @keyup.enter="onenter"
         />
       </div>
+      <p>{{ allchecked }}</p>
+      <p>{{ containernumber }}</p>
       <div class="mt-2" style="height: 50vh; overflow: auto">
         <table class="table table-hover">
           <thead class="table-primary">
             <tr style="position: sticky; top: 0">
-              <th>Part Label</th>
-              <th>Scan Time</th>
+              <th>ASN Number</th>
+              <th>Item Number</th>
+              <th>Order Box</th>
+              <th>Order Qty</th>
+              <th>Scan Box</th>
+              <th>Scan HM</th>
+              <th>Scan Qty</th>
+              <th>Now ST</th>
             </tr>
           </thead>
           <tbody>
@@ -110,53 +127,34 @@ export default {
   data() {
     return {
       scanValue: '',
-      barcode: '',
-      scanData: [],
-      selectedData: [],
       input: {},
-      data: []
+      data: [],
+      allchecked: true,
+      containernumber: ''
     }
   },
   setup() {},
   created() {
     this.input = this.$route.query
-    console.log(this.$route.query)
   },
   mounted() {
-    // this.getData()
+    this.getData()
   },
   unmounted() {},
   methods: {
-    onenter() {
-      alert('enter')
-    },
-    change() {
-      // const asciiValues = [];
-      // for (let i = 0; i < this.scannerData.length; i++) {
-      //   const charCode = this.scannerData.charCodeAt(i);
-      //   asciiValues.push(charCode);
-      // }
-
-      for (let i = 0; i < this.scanValue.length; i++) {
-        const charCode = this.scanValue.charCodeAt(i)
-        if (charCode === 29) {
-          this.barcode += '{GS}'
-        } else if (charCode === 30) {
-          this.barcode += '{RS}'
-        } else if (charCode === 4) {
-          this.barcode += '{EOT}'
-        } else if (charCode === 13) {
-          alert('13')
-        } else if (charCode === 32) {
-          alert('32')
-        } else {
-          this.barcode += String.fromCharCode(charCode)
+    async chkst() {
+      this.data.forEach((a) => {
+        console.log(a)
+        if (a.NOW_ST !== '2') {
+          this.allchecked = false
         }
-      }
+      })
     },
-    barcodeClear() {
-      this.barcode = ''
-      this.scanValue = ''
+    async savecontainer() {
+      const yes = confirm('Do you want to save container number?')
+      if (yes) {
+        await this.updatecontainer()
+      }
     },
     async getData() {
       const r = await this.$post('/getlist', {
@@ -164,6 +162,7 @@ export default {
       })
       console.log('getData', r)
       this.data = r.data.recordset
+      await this.chkst()
     },
     async chkDup(a) {
       const r = await this.$post('/chkdup', { params: a })
@@ -214,8 +213,18 @@ export default {
       const r = await this.$post('/updateorder', { params: a })
       console.log('updateorder', r)
     },
-    goToDetail(itm, date, trail) {
-      this.$router.push({ path: '/scandetail', query: { itm, date, trail } })
+    async updatecontainer() {
+      const con = this.containernumber.trim()
+      const r = await this.$post('/updatecontainer', {
+        params: [con, this.input]
+      })
+      console.log('updatecontainer', r)
+    },
+    goToProduct(a, b) {
+      this.$router.push({
+        path: '/productscan',
+        query: { ...a, ...b }
+      })
     },
     goToHome() {
       this.$router.push({
@@ -334,76 +343,81 @@ export default {
         // 리스트 데이터를 selectedData에 저장
         selectedData = selectedData[0]
         console.log(selectedData.ASN_NO)
-
-        // Overcharge 체크
-        if (selectedData.ORD_QTY < selectedData.SCAN_QTY + tempData.TMP_QTY) {
-          await this.inserthist([selectedData, tempData, today1, today2, 2])
-          alert('Over Charge - please check Scan QTY')
-          this.refresh()
-          return
-        }
-        // ASN No 체크
-        if (selectedData.ASN_NO === '') {
-          await this.inserthist([selectedData, tempData, today1, today2, 3])
-          alert('NO ASN - please check Shipping Order')
-          this.refresh()
-          return
-        }
-        // Duplicate 체크
-        if (await this.chkDup(tempData.TMP_SERNO)) {
-          await this.inserthist([selectedData, tempData, today1, today2, 4])
-          alert('Duplicate - this pallet is already scanned')
-          this.refresh()
-          return
-        }
-        // Customer 체크
-        if (selectedData.CUST_CD !== tempData.TMP_CUST) {
-          await this.inserthist([selectedData, tempData, today1, today2, 5])
-          alert('Customer not match')
-          this.refresh()
-          return
-        }
-        // 제품바코드 체크
-        // if (await this.isShaft([tempData, 'A'])) {
-        //   this.$refs.btnModal.click()
-        // if (await this.chkProduct()) {
-        //   console.log('hello')
-        // } else {
-        //   await this.inserthist([selectedData, tempData, today1, today2, 6])
-        //   alert('Product Barcode Error - please check product')
+        // this.goToProduct(
+        //   selectedData.ITMNO,
+        //   selectedData.CUST_CD,
+        //   tempData.TMP_SERNO
+        // )
+        this.goToProduct(selectedData, tempData)
+        // // Overcharge 체크
+        // if (selectedData.ORD_QTY < selectedData.SCAN_QTY + tempData.TMP_QTY) {
+        //   await this.inserthist([selectedData, tempData, today1, today2, 2])
+        //   alert('Over Charge - please check Scan QTY')
+        //   this.refresh()
         //   return
         // }
+        // // ASN No 체크
+        // if (selectedData.ASN_NO === '') {
+        //   await this.inserthist([selectedData, tempData, today1, today2, 3])
+        //   alert('NO ASN - please check Shipping Order')
+        //   this.refresh()
+        //   return
         // }
-        // 고객사PO 체크
-        if (await this.chkPO(selectedData)) {
-          await this.inserthist([selectedData, tempData, today1, today2, 7])
-          alert('PO not match')
-          this.refresh()
-          return
-        }
-        console.log('chk all clear')
-        // await this.inserthist([selectedData, tempData, today1, today2, 1])
-        // if (selectedData.ORD_QTY > selectedData.SCAN_QTY + tempData.TMP_QTY) {
-        //   await this.updateorder([
-        //     selectedData,
-        //     selectedData.SCAN_QTY + tempData.TMP_QTY,
-        //     selectedData.SCAN_BOX + 1,
-        //     today3,
-        //     1
-        //   ])
-        // } else if (
-        //   (selectedData.ORD_QTY = selectedData.SCAN_QTY + tempData.TMP_QTY)
-        // ) {
-        //   await this.updateorder([
-        //     selectedData,
-        //     selectedData.SCAN_QTY + tempData.TMP_QTY,
-        //     selectedData.SCAN_BOX + 1,
-        //     today3,
-        //     2
-        //   ])
+        // // Duplicate 체크
+        // if (await this.chkDup(tempData.TMP_SERNO)) {
+        //   await this.inserthist([selectedData, tempData, today1, today2, 4])
+        //   alert('Duplicate - this pallet is already scanned')
+        //   this.refresh()
+        //   return
         // }
-        this.scanValue = ''
-        // this.refresh()
+        // // Customer 체크
+        // if (selectedData.CUST_CD !== tempData.TMP_CUST) {
+        //   await this.inserthist([selectedData, tempData, today1, today2, 5])
+        //   alert('Customer not match')
+        //   this.refresh()
+        //   return
+        // }
+        // // 제품바코드 체크
+        // // if (await this.isShaft([tempData, 'A'])) {
+        // //   this.$refs.btnModal.click()
+        // // if (await this.chkProduct()) {
+        // //   console.log('hello')
+        // // } else {
+        // //   await this.inserthist([selectedData, tempData, today1, today2, 6])
+        // //   alert('Product Barcode Error - please check product')
+        // //   return
+        // // }
+        // // }
+        // // 고객사PO 체크
+        // if (await this.chkPO(selectedData)) {
+        //   await this.inserthist([selectedData, tempData, today1, today2, 7])
+        //   alert('PO not match')
+        //   this.refresh()
+        //   return
+        // }
+        // console.log('chk all clear')
+        // // await this.inserthist([selectedData, tempData, today1, today2, 1])
+        // // if (selectedData.ORD_QTY > selectedData.SCAN_QTY + tempData.TMP_QTY) {
+        // //   await this.updateorder([
+        // //     selectedData,
+        // //     selectedData.SCAN_QTY + tempData.TMP_QTY,
+        // //     selectedData.SCAN_BOX + 1,
+        // //     today3,
+        // //     1
+        // //   ])
+        // // } else if (
+        // //   (selectedData.ORD_QTY = selectedData.SCAN_QTY + tempData.TMP_QTY)
+        // // ) {
+        // //   await this.updateorder([
+        // //     selectedData,
+        // //     selectedData.SCAN_QTY + tempData.TMP_QTY,
+        // //     selectedData.SCAN_BOX + 1,
+        // //     today3,
+        // //     2
+        // //   ])
+        // // }
+        // this.scanValue = ''
+        // // this.refresh()
       } else {
         alert('Label Error - please check pallet label')
         console.log('no', this.scanValue.slice(0, 7))
@@ -412,37 +426,4 @@ export default {
     }
   }
 }
-
-// {/* <input type="text" id="tacos" />
-//     <button onclick="f()">code</button>
-//       let barcode = "";
-//       let barcode1 = "";
-//       let barcode2 = "";
-//       document
-//         .getElementById("tacos")
-//         .addEventListener("keypress", function (e) {
-//           // if (e.charCode === 29) {
-//           //   barcode += "{GS}";
-//           // } else if (e.charCode === 30) {
-//           //   barcode += "{RS}";
-//           // } else if (e.charCode === 4) {
-//           //   barcode += "{EOT}";
-//           // } else if (e.charCode === 13) {
-//           //   return;
-//           // } else if (e.charCode === 32) {
-//           //   return;
-//           // } else {
-//           //   barcode += String.fromCharCode(e.charCode);
-//           // }
-//           // barcode1 += e.key;
-//           // barcode2 += String.fromCharCode(e.charCode);
-//           console.log(e.charCode);
-//           console.log(e.key);
-//           console.log(String.fromCharCode(e.charCode));
-//         });
-//       function f() {
-//         console.log(barcode);
-//         // console.log(barcode1);
-//         // console.log(barcode2);
-//       }
 </script>

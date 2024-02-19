@@ -1,17 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/1_mainView.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    name: 'shippingorder',
+    component: () =>
+      import(/* webpackChunkName: "about" */ '../views/1_shippingOrder.vue')
   },
   {
-    path: '/scanning',
-    name: 'about',
+    path: '/palletscan',
+    name: 'palletscan',
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/2_scanView.vue')
+      import(/* webpackChunkName: "about" */ '../views/2_palletScan.vue')
   },
   {
     path: '/scandetail',
@@ -23,7 +23,7 @@ const routes = [
     path: '/productscan',
     name: 'productscan',
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/4_productView.vue')
+      import(/* webpackChunkName: "about" */ '../views/4_productScan.vue')
   }
 ]
 

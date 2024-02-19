@@ -17,7 +17,7 @@
         padding: 1vh;
       "
     >
-      Shipping Order List
+      SHIPPING ORDER
       <font-awesome-icon
         icon="fa-solid fa-rotate"
         class="float-end"
@@ -160,7 +160,7 @@ export default {
   created() {},
   mounted() {
     this.setDate()
-    // this.fullscreen()
+    this.fullscreen()
   },
   unmounted() {},
   methods: {
@@ -178,12 +178,16 @@ export default {
           params: [this.shipDate, this.customer]
         })
         console.log(r)
+        if (r === undefined) {
+          alert('Error at getData')
+          return
+        }
         this.data = r.data.recordset
       }
     },
     goToScan(a) {
       this.$router.push({
-        path: '/scanning',
+        path: '/palletscan',
         query: { trail: a, date: this.shipDate, cust: this.customer }
       })
     },
@@ -191,7 +195,15 @@ export default {
       location.reload()
     },
     fullscreen() {
-      document.documentElement.requestFullscreen()
+      window.addEventListener(
+        'load',
+        function (e) {
+          setTimeout(function () {
+            window.scrollTo(0, 1)
+          }, 1)
+        },
+        false
+      )
     }
   }
 }

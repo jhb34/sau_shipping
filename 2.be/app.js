@@ -90,6 +90,26 @@ app.post("/getlist", (req, res) => {
     }
   );
 });
+app.post("/getproductlist", (req, res) => {
+  const { params } = req.body;
+  console.log(params);
+  // const date = params[0].trim();
+  // const trailer = params[1].trim();
+  // const cust = params[2].trim();
+  const request = new sql.Request();
+  request.query(
+    `select TOP 100 * from SAL_PART where STAG_NO='${params}' order by SCAN_DTTM desc
+      `,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+        return;
+      }
+      res.send(result);
+    }
+  );
+});
 
 app.post("/chkdup", (req, res) => {
   const a = req.body.params;
@@ -137,6 +157,46 @@ app.post("/chkitmno", (req, res) => {
   const request = new sql.Request();
   request.query(
     `select top 100 * from ITM_MST where ITMNO='${a}'
+      `,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+        return;
+      }
+      console.log(result);
+      res.send(result);
+    }
+  );
+});
+app.post("/chkalc", (req, res) => {
+  const a = req.body.params;
+  console.log(a);
+  const itm = a[0].trim();
+  const alc = a[1].trim();
+  const request = new sql.Request();
+  request.query(
+    `select top 100 * from ITM_MST where ITMNO='${itm}' and ECO_NO='${alc}'
+      `,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+        return;
+      }
+      console.log(result);
+      res.send(result);
+    }
+  );
+});
+app.post("/chkprdno", (req, res) => {
+  const a = req.body.params;
+  console.log(a);
+  // const itm = a[0].trim();
+  // const alc = a[1].trim();
+  const request = new sql.Request();
+  request.query(
+    `select top 100 * from SAL_PART where PART_LABEL='${a}'
       `,
     (err, result) => {
       if (err) {
@@ -215,6 +275,28 @@ app.post("/inserthist", (req, res) => {
     }
   );
 });
+app.post("/insertproduct", (req, res) => {
+  const { params } = req.body;
+  console.log(params);
+  const stagno = params[0];
+  const partlabel = params[1];
+  const tagpart = params[2];
+  const labelpart = params[3];
+  const dttm = params[4];
+  const request = new sql.Request();
+  request.query(
+    `insert into SAL_PART values('${stagno}','${partlabel}','${tagpart}','${labelpart}',${dttm})
+      `,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+        return;
+      }
+      res.send(result);
+    }
+  );
+});
 app.post("/updateorder", (req, res) => {
   const { params } = req.body;
   console.log(params);
@@ -226,6 +308,28 @@ app.post("/updateorder", (req, res) => {
   const request = new sql.Request();
   request.query(
     `update SAL_ORDER set SCAN_QTY=${scanqty},SCAN_BOX=${scanbox},SCAN_HM='${today3}',NOW_ST='${code}' where SAL_YMD='${selectd.SAL_YMD}' and TRAILER_NO='${selectd.TRAILER_NO}'and ITMNO='${selectd.ITMNO}'      `,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+        return;
+      }
+      console.log(result);
+      res.send(result);
+    }
+  );
+});
+app.post("/updatecontainer", (req, res) => {
+  const { params } = req.body;
+  console.log(params);
+  const con = params[0];
+  const selectd = params[1];
+  // const scanbox = params[2];
+  // const today3 = params[3];
+  // const code = params[4];
+  const request = new sql.Request();
+  request.query(
+    `update SAL_ORDER set CONTAINER_NO='${con}',NOW_ST='3' where SAL_YMD='${selectd.SAL_YMD}' and TRAILER_NO='${selectd.TRAILER_NO}'and ITMNO='${selectd.ITMNO}'      `,
     (err, result) => {
       if (err) {
         console.log(err);
