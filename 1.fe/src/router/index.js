@@ -5,13 +5,13 @@ const routes = [
     path: '/',
     name: 'shippingorder',
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/1_shippingOrder.vue')
+      import(/* webpackChunkName: "main" */ '../views/1_shippingOrder.vue')
   },
   {
     path: '/palletscan',
     name: 'palletscan',
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/2_palletScan.vue')
+      import(/* webpackChunkName: "pallet" */ '../views/2_palletScan.vue')
   },
   {
     path: '/scandetail',
@@ -23,7 +23,7 @@ const routes = [
     path: '/productscan',
     name: 'productscan',
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/4_productScan.vue')
+      import(/* webpackChunkName: "product" */ '../views/4_productScan.vue')
   }
 ]
 

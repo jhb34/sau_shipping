@@ -159,8 +159,16 @@ export default {
   setup() {},
   created() {},
   mounted() {
+    if (localStorage.getItem('reloaded')) {
+      // The page was just reloaded. Clear the value from local storage
+      // so that it will reload the next time this page is visited.
+      localStorage.removeItem('reloaded')
+    } else {
+      // Set a flag so that we know not to reload the page twice.
+      localStorage.setItem('reloaded', '1')
+      location.reload()
+    }
     this.setDate()
-    this.fullscreen()
   },
   unmounted() {},
   methods: {
@@ -185,25 +193,14 @@ export default {
         this.data = r.data.recordset
       }
     },
+    refresh() {
+      location.reload()
+    },
     goToScan(a) {
       this.$router.push({
         path: '/palletscan',
         query: { trail: a, date: this.shipDate, cust: this.customer }
       })
-    },
-    refresh() {
-      location.reload()
-    },
-    fullscreen() {
-      window.addEventListener(
-        'load',
-        function (e) {
-          setTimeout(function () {
-            window.scrollTo(0, 1)
-          }, 1)
-        },
-        false
-      )
     }
   }
 }

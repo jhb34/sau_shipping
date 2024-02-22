@@ -255,7 +255,7 @@ app.post("/getscandetail", (req, res) => {
 
 app.post("/inserthist", (req, res) => {
   const { params } = req.body;
-  console.log(params);
+  console.log("inserthist", params);
   const selectd = params[0];
   const scand = params[1];
   const today1 = params[2];
@@ -277,7 +277,7 @@ app.post("/inserthist", (req, res) => {
 });
 app.post("/insertproduct", (req, res) => {
   const { params } = req.body;
-  console.log(params);
+  console.log("insertproduct", params);
   const stagno = params[0];
   const partlabel = params[1];
   const tagpart = params[2];
@@ -299,7 +299,7 @@ app.post("/insertproduct", (req, res) => {
 });
 app.post("/updateorder", (req, res) => {
   const { params } = req.body;
-  console.log(params);
+  console.log("updateorder", params);
   const selectd = params[0];
   const scanqty = params[1];
   const scanbox = params[2];
@@ -327,17 +327,17 @@ app.post("/updatecontainer", (req, res) => {
   // const scanbox = params[2];
   // const today3 = params[3];
   // const code = params[4];
-  const request = new sql.Request();
-  request.query(
-    `update SAL_ORDER set CONTAINER_NO='${con}',NOW_ST='3' where SAL_YMD='${selectd.SAL_YMD}' and TRAILER_NO='${selectd.TRAILER_NO}'and ITMNO='${selectd.ITMNO}'      `,
-    (err, result) => {
-      if (err) {
-        console.log(err);
-        res.sendStatus(500);
-        return;
-      }
-      console.log(result);
-      res.send(result);
-    }
-  );
+  // const request = new sql.Request();
+  // request.query(
+  //   `update SAL_ORDER set CONTAINER_NO='${con}',NOW_ST='3' where SAL_YMD='${selectd.date}' and TRAILER_NO='${selectd.trail}'  `,
+  //   (err, result) => {
+  //     if (err) {
+  //       console.log(err);
+  //       res.sendStatus(500);
+  //       return;
+  //     }
+  //     console.log(result);
+  //     res.send(result);
+  //   }
+  // );
 });
