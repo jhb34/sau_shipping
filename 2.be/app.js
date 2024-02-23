@@ -1,10 +1,44 @@
 const express = require("express");
 const cors = require("cors");
+
+const fs = require("fs");
+const morgan = require("morgan");
+const rfs = require("rotating-file-stream");
+const path = require("path");
+
 const cookie = require("cookie-parser");
 const session = require("express-session");
 require("dotenv").config({ path: ".env" });
 const sql = require("mssql");
 const app = express();
+
+// const generator = (time, index) => {
+//   if (!time) return "file.log";
+//   const yearmonth =
+//     time.getFullYear() + (time.getMonth() + 1).toString().padStart(2, "0");
+//   const day = time.getDate().toString().padStart(2, "0");
+
+//   return `${yearmonth}${path.sep}${yearmonth}${day}-${index}-file.log`;
+// };
+
+// const accessLogStream = rfs.createStream(generator, {
+//   interval: "1d", //'1d'
+//   size: "10M",
+//   path: path.join(__dirname, "log"),
+// });
+
+app.use(
+  morgan(
+    "dev"
+    // 'combined'
+    //  {
+    //   stream: accessLogStream,
+    //   skip: function (req, res) {
+    //     return res.statusCode < 400;
+    //   },
+    // }
+  )
+);
 
 app.use(express.json());
 app.use(cookie());
