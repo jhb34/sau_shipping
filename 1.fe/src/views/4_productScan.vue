@@ -17,7 +17,7 @@
         padding: 1vh;
       "
     >
-      PRODUCT SCAN
+      3. PRODUCT SCAN
       <font-awesome-icon
         icon="fa-solid fa-rotate"
         class="float-end"
@@ -25,7 +25,7 @@
         @click="refresh"
       />
       <font-awesome-icon
-        icon="fa-solid fa-left-long"
+        icon="fa-solid fa-house"
         class="float-start"
         @click="goToHome"
         style="height: 4vh"
@@ -49,11 +49,6 @@
           <span style="font-size: 2vh">{{ pinput.TMP_SERNO }}</span>
         </div>
       </div>
-      <p>scan: {{ pbarcode }}</p>
-      <p>input: {{ pinput }}</p>
-      <p>selectedData: {{ selectedData }}</p>
-      <button @click="pbarcodeChk">process</button>
-      <button @click="barcodeClear">clear</button>
       <div class="input-group mt-2">
         <input
           type="text"
@@ -62,6 +57,7 @@
           @input="change"
           class="form-control"
           @keyup.enter="pbarcodeChk"
+          autofocus
         />
       </div>
       <div class="mt-2" style="height: 50vh; overflow: auto">
@@ -145,7 +141,7 @@ export default {
       const today1 = this.getDate1(new Date())
       const today2 = this.getDate2(new Date())
       const today3 = this.getDate3(new Date())
-      const r = await this.$post('/getproductlist', {
+      const r = await this.$post('/api/productscan/getproductlist', {
         params: this.pinput.TMP_SERNO
       })
       if (r === undefined) {
@@ -201,14 +197,7 @@ export default {
             2
           ])
         }
-        this.$router.push({
-          path: '/palletscan',
-          query: {
-            trail: this.pinput.TRAILER_NO,
-            date: this.pinput.SAL_YMD,
-            cust: this.pinput.CUST_CD
-          }
-        })
+        this.goToPalletscan()
       } else {
         this.pdata = r.data.recordset
       }
@@ -245,7 +234,7 @@ export default {
     //   }
     // },
     async chkALC(a) {
-      const r = await this.$post('/chkalc', { params: a })
+      const r = await this.$post('/api/productscan/chkalc', { params: a })
       if (r === undefined) {
         alert('Error at chkALC')
         return
@@ -258,7 +247,7 @@ export default {
       }
     },
     async chkprdno(a) {
-      const r = await this.$post('/chkprdno', { params: a })
+      const r = await this.$post('/api/productscan/chkprdno', { params: a })
       if (r === undefined) {
         alert('Error at chkprdno')
         return
@@ -271,21 +260,23 @@ export default {
       }
     },
     async inserthist(a) {
-      const r = await this.$post('/inserthist', { params: a })
+      const r = await this.$post('/api/inserthist', { params: a })
       if (r === undefined) {
         alert('Error at inserthist')
       }
       console.log('inserthist', r)
     },
     async insertproduct(a) {
-      const r = await this.$post('/insertproduct', { params: a })
+      const r = await this.$post('/api/productscan/insertproduct', {
+        params: a
+      })
       if (r === undefined) {
         alert('Error at insertproduct')
       }
       console.log('insertproduct', r)
     },
     async updateorder(a) {
-      const r = await this.$post('/updateorder', { params: a })
+      const r = await this.$post('/api/updateorder', { params: a })
       if (r === undefined) {
         alert('Error at updateorder')
       }
@@ -294,6 +285,16 @@ export default {
     goToHome() {
       this.$router.push({
         path: '/'
+      })
+    },
+    goToPalletscan() {
+      this.$router.push({
+        path: '/palletscan',
+        query: {
+          trail: this.pinput.TRAILER_NO,
+          date: this.pinput.SAL_YMD,
+          cust: this.pinput.CUST_CD
+        }
       })
     },
     refresh() {
@@ -399,9 +400,9 @@ export default {
         ])
         this.refresh()
       } else {
-        alert('Label Error - please check pallet label')
+        alert('Label Error - please check product label')
         console.log('no', this.pscanValue.slice(0, 7))
-        this.pscanValue = ''
+        location.reload()
       }
     }
   }

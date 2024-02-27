@@ -17,7 +17,7 @@
         padding: 1vh;
       "
     >
-      PALLET SCAN
+      2. PALLET SCAN
       <font-awesome-icon
         icon="fa-solid fa-rotate"
         class="float-end"
@@ -25,7 +25,7 @@
         @click="refresh"
       />
       <font-awesome-icon
-        icon="fa-solid fa-left-long"
+        icon="fa-solid fa-house"
         class="float-start"
         @click="goToHome"
         style="height: 4vh"
@@ -51,59 +51,69 @@
           <span style="font-size: 2vh">{{ input.trail }}</span>
         </div>
       </div>
-      <p>scan: {{ scanValue }} <button @click="barcodeChk">a</button></p>
-      <div class="input-group mt-1" v-if="allchecked">
+      <div class="input-group mt-2" v-if="!allchecked">
+        <input
+          type="text"
+          style="color: red"
+          placeholder="Scan Here"
+          v-model="scanValue"
+          class="form-control"
+          @keyup.enter="barcodeChk"
+          autofocus
+        />
+      </div>
+      <div class="input-group mt-1" v-else>
         <span class="input-group-text col-4 text-center" style="font-size: 2vh"
           >Container No.</span
         >
-        <input type="text" class="form-control" v-model="containernumber" />
+        <input
+          type="text"
+          class="form-control"
+          v-model="containernumber"
+          inputmode="numeric"
+        />
         <button
-          class="btn btn-outline-secondary"
+          class="btn btn-primary"
           @click="savecontainer"
           :disabled="containernumber === ''"
         >
           Save
         </button>
       </div>
-      <div class="input-group mt-2" v-else>
-        <input
-          type="text"
-          placeholder="Scan Here"
-          v-model="scanValue"
-          class="form-control"
-          @keyup.enter="barcodeChk"
-        />
-      </div>
-      <p>{{ allchecked }}</p>
-      <p>{{ containernumber }}</p>
-      <div class="mt-2" style="height: 50vh; overflow: auto">
+      <div class="mt-2" style="height: 65vh; overflow: auto">
         <table class="table table-hover">
           <thead class="table-primary">
             <tr style="position: sticky; top: 0">
-              <th>ASN Number</th>
-              <th>Item Number</th>
-              <th>Order Box</th>
-              <th>Order Qty</th>
-              <th>Scan Box</th>
-              <th>Scan HM</th>
-              <th>Scan Qty</th>
-              <th>Now ST</th>
+              <th>ASN</th>
+              <th>Item</th>
+              <th>Status</th>
+              <th>Order</th>
+              <th>Scan</th>
+              <th>Time</th>
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="a in data"
-              :key="a"
-              @click="goToDetail(a.ITMNO, a.SAL_YMD, a.TRAILER_NO)"
-            >
-              <td>{{ a.ASN_NO }}</td>
+            <tr v-for="a in data" :key="a">
+              <td>{{ a.ASN_NO.slice(0, -10) }}</td>
               <td>{{ a.ITMNO }}</td>
-              <td>{{ a.ORD_BOX }}</td>
+              <td>
+                <span
+                  v-if="a.NOW_ST === '1'"
+                  class="badge rounded-pill text-bg-warning"
+                  >Scanning</span
+                >
+                <span
+                  v-else-if="a.NOW_ST === '0'"
+                  class="badge rounded-pill text-bg-light"
+                  >Waiting</span
+                >
+                <span v-else class="badge rounded-pill text-bg-secondary"
+                  >Done</span
+                >
+              </td>
               <td>{{ a.ORD_QTY }}</td>
-              <td>{{ a.SCAN_BOX }}</td>
-              <td>{{ a.SCAN_HM }}</td>
               <td>{{ a.SCAN_QTY }}</td>
-              <td>{{ a.NOW_ST }}</td>
+              <td>{{ a.SCAN_HM.substring(10, 19) }}</td>
               <!-- <td>
                 <span v-if="a.NOW_ST === '0'" class="badge bg-warning text-dark"
                   >Ready</span
@@ -167,7 +177,7 @@ export default {
       }
     },
     async getData() {
-      const r = await this.$post('/getlist', {
+      const r = await this.$post('/api/palletscan/getlist', {
         params: [this.input.date, this.input.trail, this.input.cust]
       })
       if (r === undefined) {
@@ -179,7 +189,7 @@ export default {
       await this.chkst()
     },
     async chkDup(a) {
-      const r = await this.$post('/chkdup', { params: a })
+      const r = await this.$post('/api/palletscan/chkdup', { params: a })
       if (r === undefined) {
         alert('Error at chkDup')
         return
@@ -192,7 +202,7 @@ export default {
       }
     },
     async chkPO(a) {
-      const r = await this.$post('/chkpo', { params: a })
+      const r = await this.$post('/api/palletscan/chkpo', { params: a })
       if (r === undefined) {
         alert('Error at chkPO')
         return
@@ -205,7 +215,7 @@ export default {
       }
     },
     async chkITMNO(a) {
-      const r = await this.$post('/chkitmno', { params: a })
+      const r = await this.$post('/api/palletscan/chkitmno', { params: a })
       if (r === undefined) {
         alert('Error at chkITMNO')
         return
@@ -218,7 +228,7 @@ export default {
       }
     },
     async isShaft(a) {
-      const r = await this.$post('/isshaft', { params: a })
+      const r = await this.$post('/api/palletscan/isshaft', { params: a })
       if (r === undefined) {
         alert('Error at isShaft')
         return
@@ -231,7 +241,7 @@ export default {
       }
     },
     async inserthist(a) {
-      const r = await this.$post('/inserthist', { params: a })
+      const r = await this.$post('/api/inserthist', { params: a })
       if (r === undefined) {
         alert('Error at inserthist')
         return
@@ -239,7 +249,7 @@ export default {
       console.log('inserthist', r)
     },
     async updateorder(a) {
-      const r = await this.$post('/updateorder', { params: a })
+      const r = await this.$post('/api/updateorder', { params: a })
       if (r === undefined) {
         alert('Error at updateorder')
         return
@@ -248,7 +258,7 @@ export default {
     },
     async updatecontainer() {
       const con = this.containernumber.trim()
-      const r = await this.$post('/updatecontainer', {
+      const r = await this.$post('/api/palletscan/updatecontainer', {
         params: [con, this.input]
       })
       if (r === undefined) {

@@ -17,7 +17,7 @@
         padding: 1vh;
       "
     >
-      SHIPPING ORDER
+      1. SHIPPING ORDER
       <font-awesome-icon
         icon="fa-solid fa-rotate"
         class="float-end"
@@ -142,10 +142,13 @@
           </tbody>
         </table>
       </div>
+      <button @click="play">Play a sound</button>
     </div>
   </div>
 </template>
 <script>
+import { useSound } from '@vueuse/sound'
+import buttonSfx from '../assets/sounds/button.mp3'
 export default {
   components: {},
   data() {
@@ -156,7 +159,13 @@ export default {
       data: []
     }
   },
-  setup() {},
+  setup() {
+    const { play } = useSound(buttonSfx)
+
+    return {
+      play
+    }
+  },
   created() {},
   mounted() {
     if (localStorage.getItem('reloaded')) {
@@ -182,7 +191,7 @@ export default {
       if (this.shipDate === '' || this.customer === '') {
         alert('Please select Date')
       } else {
-        const r = await this.$post('/getorder', {
+        const r = await this.$post('/api/shippingorder/getorder', {
           params: [this.shipDate, this.customer]
         })
         console.log(r)
