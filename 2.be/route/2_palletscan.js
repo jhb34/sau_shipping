@@ -22,7 +22,7 @@ router.post("/getlist", (req, res) => {
   const cust = params[2].trim();
   const request = new sql.Request();
   request.query(
-    `select TOP 100 * from SAL_ORDER where SAL_YMD=${date} and TRAILER_NO='${trailer}' and CUST_CD='${cust}' order by ITMNO
+    `select TOP 100 * from SAL_ORDER where SAL_YMD=${date} and TRAILER_NO='${trailer}' and CUST_CD='${cust}' order by SCAN_HM desc,ITMNO
         `,
     (err, result) => {
       if (err) {

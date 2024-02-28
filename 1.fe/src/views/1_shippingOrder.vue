@@ -90,6 +90,16 @@
           </div>
         </div>
       </div>
+      <div class="music-player">
+        <audio ref="erroraudio">
+          <source src="../assets/sounds/error.mp3" type="audio/mpeg" />
+        </audio>
+        <div
+          @click="errorSound"
+          ref="errorbutton"
+          class="toggle-sound paused"
+        ></div>
+      </div>
       <div class="input-group mt-2">
         <button
           class="btn btn-primary col-3"
@@ -142,13 +152,10 @@
           </tbody>
         </table>
       </div>
-      <button @click="play">Play a sound</button>
     </div>
   </div>
 </template>
 <script>
-import { useSound } from '@vueuse/sound'
-import buttonSfx from '../assets/sounds/button.mp3'
 export default {
   components: {},
   data() {
@@ -156,16 +163,11 @@ export default {
       dateValue: new Date().toISOString().slice(0, 10),
       shipDate: '',
       customer: 'S1300',
-      data: []
+      data: [],
+      playing: false
     }
   },
-  setup() {
-    const { play } = useSound(buttonSfx)
-
-    return {
-      play
-    }
-  },
+  setup() {},
   created() {},
   mounted() {
     if (localStorage.getItem('reloaded')) {
@@ -181,6 +183,16 @@ export default {
   },
   unmounted() {},
   methods: {
+    errorSound() {
+      const audio = this.$refs.erroraudio
+      this.playing = !this.playing
+      if (this.playing) {
+        audio.play()
+        this.playing = !this.playing
+      } else {
+        audio.pause()
+      }
+    },
     setDate() {
       let a = ''
       a = this.dateValue.split('-')
@@ -189,6 +201,7 @@ export default {
     },
     async getData() {
       if (this.shipDate === '' || this.customer === '') {
+        this.$refs.errorbutton.click()
         alert('Please select Date')
       } else {
         const r = await this.$post('/api/shippingorder/getorder', {

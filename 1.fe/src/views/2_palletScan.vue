@@ -43,6 +43,16 @@
           >
         </div>
       </div>
+      <div class="music-player">
+        <audio ref="erroraudio">
+          <source src="../assets/sounds/error.mp3" />
+        </audio>
+        <div
+          @click="errorSound"
+          ref="errorbutton"
+          class="toggle-sound paused"
+        ></div>
+      </div>
       <div class="input-group mt-1">
         <span class="input-group-text col-3 text-center" style="font-size: 2vh"
           >Trailer No.</span
@@ -93,7 +103,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="a in data" :key="a">
+            <tr
+              v-for="a in data"
+              :key="a"
+              :class="[
+                a.NOW_ST === '1' ? now1 : a.NOW_ST === '0' ? null : now2
+              ]"
+            >
               <td>{{ a.ASN_NO.slice(0, -10) }}</td>
               <td>{{ a.ITMNO }}</td>
               <td>
@@ -141,7 +157,10 @@ export default {
       input: {},
       data: [],
       allchecked: true,
-      containernumber: ''
+      containernumber: '',
+      now1: 'table-warning',
+      now2: 'table-secondary',
+      playing: false
     }
   },
   setup() {},
@@ -162,6 +181,16 @@ export default {
   },
   unmounted() {},
   methods: {
+    errorSound() {
+      const audio = this.$refs.erroraudio
+      this.playing = !this.playing
+      if (this.playing) {
+        audio.play()
+        this.playing = !this.playing
+      } else {
+        audio.pause()
+      }
+    },
     async chkst() {
       this.data.forEach((a) => {
         if (a.NOW_ST !== '2') {
@@ -343,6 +372,7 @@ export default {
             TMP_ITMNO = TMP_ITMNO.slice(0, 5) + '-' + TMP_ITMNO.slice(5)
             // 아이템번호가 아이템마스터에 있는지 체크
             if (await this.chkITMNO(TMP_ITMNO)) {
+              this.$refs.errorbutton.click()
               alert('No Item - scan item is not in Item Master')
               location.reload()
               return
@@ -352,6 +382,7 @@ export default {
             TMP_QTY = Number(TMP_QTY)
             // Label QTY 체크
             if (!TMP_QTY > 0) {
+              this.$refs.errorbutton.click()
               alert('QTY Error - please check scan QTY is correct')
               location.reload()
               return
@@ -373,6 +404,7 @@ export default {
             } else if (TMP_SERNO.slice(0, 4) === '1102') {
               TMP_CUST = 'S1300'
             } else {
+              this.$refs.errorbutton.click()
               alert('Customer Error - please check pallet serno is correct')
               location.reload()
               return
@@ -391,6 +423,7 @@ export default {
         console.log('list data', selectedData)
         // 스캔아이템 번호가 쉬핑오더 리스트에 있는지 체크
         if (selectedData.length === 0) {
+          this.$refs.errorbutton.click()
           alert('Not in List - scan Item does not match with Shipping Order')
           location.reload()
           return
@@ -401,6 +434,7 @@ export default {
         // Overcharge 체크
         if (selectedData.ORD_QTY < selectedData.SCAN_QTY + tempData.TMP_QTY) {
           await this.inserthist([selectedData, tempData, today1, today2, 2])
+          this.$refs.errorbutton.click()
           alert('Over Charge - please check Scan QTY')
           location.reload()
           return
@@ -408,6 +442,7 @@ export default {
         // ASN No 체크
         if (selectedData.ASN_NO === '') {
           await this.inserthist([selectedData, tempData, today1, today2, 3])
+          this.$refs.errorbutton.click()
           alert('NO ASN - please check Shipping Order')
           location.reload()
           return
@@ -415,6 +450,7 @@ export default {
         // Duplicate 체크
         if (await this.chkDup(tempData.TMP_SERNO)) {
           await this.inserthist([selectedData, tempData, today1, today2, 4])
+          this.$refs.errorbutton.click()
           alert('Duplicate - this pallet is already scanned')
           location.reload()
           return
@@ -422,6 +458,7 @@ export default {
         // Customer 체크
         if (selectedData.CUST_CD !== tempData.TMP_CUST) {
           await this.inserthist([selectedData, tempData, today1, today2, 5])
+          this.$refs.errorbutton.click()
           alert('Customer not match')
           location.reload()
           return
@@ -429,6 +466,7 @@ export default {
         // 고객사PO 체크
         if (await this.chkPO(selectedData)) {
           await this.inserthist([selectedData, tempData, today1, today2, 7])
+          this.$refs.errorbutton.click()
           alert('PO not match')
           location.reload()
           return

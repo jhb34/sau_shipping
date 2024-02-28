@@ -49,6 +49,16 @@
           <span style="font-size: 2vh">{{ pinput.TMP_SERNO }}</span>
         </div>
       </div>
+      <div class="input-group mt-1">
+        <span class="input-group-text col-3 text-center" style="font-size: 2vh"
+          >Message</span
+        >
+        <div class="form-control">
+          <span style="font-size: 2vh"
+            >Scan {{ 2 - pdata.length }} products</span
+          >
+        </div>
+      </div>
       <div class="input-group mt-2">
         <input
           type="text"
@@ -370,12 +380,18 @@ export default {
             PRD_ALC = a.slice(1)
             alert(PRD_ALC)
             const PRD_CODE = PRD_ALC.slice(0, 4)
-            let prdno = this.pinput.TMP_ITMNO
-            if (this.pinput.TMP_CUST === 'S1301') {
-              prdno = this.pinput.TMP_ITMNO + 'K'
-            }
+            // let prdno = this.pinput.TMP_ITMNO
+            // if (this.pinput.TMP_CUST === 'S1301') {
+            //   prdno = this.pinput.TMP_ITMNO + 'K'
+            // }
             // product ALC 체크
-            if (await this.chkALC([prdno, PRD_CODE])) {
+            if (
+              await this.chkALC([
+                this.pinput.TMP_ITMNO,
+                this.pinput.TMP_CUST,
+                PRD_CODE
+              ])
+            ) {
               alert('ALC Code Error - please check Product ALC Code')
               this.refresh()
               return
