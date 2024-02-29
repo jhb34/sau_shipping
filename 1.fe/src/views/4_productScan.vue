@@ -34,29 +34,29 @@
     <div class="container">
       <i class="bi-alarm" style="font-size: 2rem; color: cornflowerblue"></i>
       <div class="input-group mt-2">
-        <span class="input-group-text col-3" style="font-size: 2vh"
+        <span class="input-group-text col-4" style="font-size: 3vh"
           >Item No.</span
         >
         <div class="form-control">
-          <span style="font-size: 2vh">{{ pinput.ITMNO }}</span>
+          <span style="font-size: 3vh">{{ pinput.ITMNO }}</span>
         </div>
       </div>
       <div class="input-group mt-1">
-        <span class="input-group-text col-3 text-center" style="font-size: 2vh"
+        <span class="input-group-text col-4 text-center" style="font-size: 3vh"
           >Pallet No.</span
         >
         <div class="form-control">
-          <span style="font-size: 2vh">{{ pinput.TMP_SERNO }}</span>
+          <span style="font-size: 3vh">{{ pinput.TMP_SERNO }}</span>
         </div>
       </div>
       <div class="input-group mt-1">
-        <span class="input-group-text col-3 text-center" style="font-size: 2vh"
+        <span class="input-group-text col-4 text-center" style="font-size: 3vh"
           >Message</span
         >
         <div class="form-control">
-          <span style="font-size: 2vh"
-            >Scan {{ 2 - pdata.length }} products</span
-          >
+          <span style="font-size: 3vh">Scan&nbsp;&nbsp;&nbsp;</span>
+          <span style="font-size: 5vh; color: red">{{ 2 - pdata.length }}</span>
+          <span style="font-size: 3vh">&nbsp;&nbsp;&nbsp;more products</span>
         </div>
       </div>
       <div class="input-group mt-2">
@@ -365,9 +365,7 @@ export default {
         for (const a of datas) {
           if (a.slice(0, 1) === 'P') {
             PRD_ITMNO = a.slice(1)
-            alert(PRD_ITMNO)
             PALLET_ITMNO = this.pinput.TMP_ITMNO.replace('-', '')
-            alert(PALLET_ITMNO)
             // 제품아이템번호가 파렛트 아이템번호와 같은지 체크
             if (PRD_ITMNO !== PALLET_ITMNO) {
               alert(
@@ -378,7 +376,6 @@ export default {
             }
           } else if (a.slice(0, 1) === 'S') {
             PRD_ALC = a.slice(1)
-            alert(PRD_ALC)
             const PRD_CODE = PRD_ALC.slice(0, 4)
             // let prdno = this.pinput.TMP_ITMNO
             // if (this.pinput.TMP_CUST === 'S1301') {
@@ -398,7 +395,6 @@ export default {
             }
           } else if (a.slice(0, 1) === 'T') {
             PRD_NO = a.slice(1)
-            alert(PRD_NO)
           }
         }
         const productNO = PRD_ALC + PRD_NO
@@ -424,3 +420,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+input:focus {
+  background: yellow;
+}
+</style>

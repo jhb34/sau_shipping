@@ -34,9 +34,9 @@
     <div class="container">
       <i class="bi-alarm" style="font-size: 2rem; color: cornflowerblue"></i>
       <div class="input-group mt-2" @change="setDate">
-        <span class="input-group-text col-3" style="font-size: 2vh">Date</span>
+        <span class="input-group-text col-4" style="font-size: 3vh">Date</span>
         <div class="form-control">
-          <span style="font-size: 2vh"
+          <span style="font-size: 3vh"
             >{{ input.date.substring(0, 4) }} /
             {{ input.date.substring(4, 6) }} /
             {{ input.date.substring(6, 9) }}</span
@@ -44,7 +44,7 @@
         </div>
       </div>
       <div class="music-player">
-        <audio ref="erroraudio">
+        <audio ref="erroraudio" muted>
           <source src="../assets/sounds/error.mp3" />
         </audio>
         <div
@@ -54,17 +54,16 @@
         ></div>
       </div>
       <div class="input-group mt-1">
-        <span class="input-group-text col-3 text-center" style="font-size: 2vh"
+        <span class="input-group-text col-4 text-center" style="font-size: 3vh"
           >Trailer No.</span
         >
         <div class="form-control">
-          <span style="font-size: 2vh">{{ input.trail }}</span>
+          <span style="font-size: 3vh">{{ input.trail }}</span>
         </div>
       </div>
       <div class="input-group mt-2" v-if="!allchecked">
         <input
           type="text"
-          style="color: red"
           placeholder="Scan Here"
           v-model="scanValue"
           class="form-control"
@@ -73,7 +72,7 @@
         />
       </div>
       <div class="input-group mt-1" v-else>
-        <span class="input-group-text col-4 text-center" style="font-size: 2vh"
+        <span class="input-group-text col-4 text-center" style="font-size: 3vh"
           >Container No.</span
         >
         <input
@@ -185,11 +184,15 @@ export default {
       const audio = this.$refs.erroraudio
       this.playing = !this.playing
       if (this.playing) {
+        this.$refs.erroraudio.muted = false
         audio.play()
         this.playing = !this.playing
       } else {
         audio.pause()
       }
+      // const sound = new Audio('/error.mp3')
+      // console.log(sound)
+      // sound.play()
     },
     async chkst() {
       this.data.forEach((a) => {
@@ -516,3 +519,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+input:focus {
+  background: yellow;
+}
+</style>

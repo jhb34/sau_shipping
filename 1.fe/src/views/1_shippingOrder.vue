@@ -91,8 +91,8 @@
         </div>
       </div>
       <div class="music-player">
-        <audio ref="erroraudio">
-          <source src="../assets/sounds/error.mp3" type="audio/mpeg" />
+        <audio ref="erroraudio" muted>
+          <source src="../assets/sounds/error.mp3" />
         </audio>
         <div
           @click="errorSound"
@@ -112,7 +112,7 @@
       <div
         class="mt-2"
         v-if="data.length > 0"
-        style="height: 50vh; overflow: auto"
+        style="height: 65vh; overflow: auto"
       >
         <table class="table table-hover">
           <thead class="table-primary">
@@ -187,6 +187,7 @@ export default {
       const audio = this.$refs.erroraudio
       this.playing = !this.playing
       if (this.playing) {
+        this.$refs.erroraudio.muted = false
         audio.play()
         this.playing = !this.playing
       } else {

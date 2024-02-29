@@ -43,7 +43,7 @@ router.post("/chkalc", (req, res) => {
   const alc = a[2].trim();
   const request = new sql.Request();
   request.query(
-    `select top 100 * from ITM_MST where ITMNO like '${itm}%' and CUST_CD='${customer}'and ECO_NO='${alc}'
+    `select top 100 * from ITM_MST where ITMNO like '${itm}%' and CUST_CD='${customer}'and ECO_NO like'${alc}%'
         `,
     (err, result) => {
       if (err) {
