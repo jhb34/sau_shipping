@@ -9,7 +9,7 @@
   >
     <div
       style="
-        background-color: #067dd7;
+        background-color: #0b9422;
         color: azure;
         height: 6vh;
         font-size: 3vh;
@@ -49,6 +49,16 @@
           <span style="font-size: 3vh">{{ pinput.TMP_SERNO }}</span>
         </div>
       </div>
+      <div class="music-player">
+        <audio ref="erroraudio" src="/error.mp3" muted></audio>
+        <audio ref="sucessaudio" src="/success.mp3" muted></audio>
+        <button type="button" @click="errorSound" ref="errorbutton">
+          Play Error
+        </button>
+        <button type="button" @click="successSound" ref="successbutton">
+          Play Success
+        </button>
+      </div>
       <div class="input-group mt-1">
         <span class="input-group-text col-4 text-center" style="font-size: 3vh"
           >Message</span
@@ -72,7 +82,7 @@
       </div>
       <div class="mt-2" style="height: 50vh; overflow: auto">
         <table class="table table-hover">
-          <thead class="table-primary">
+          <thead class="table-dark">
             <tr style="position: sticky; top: 0">
               <th>Part Label Number</th>
               <th>Scan Time</th>
@@ -120,6 +130,38 @@ export default {
   },
   unmounted() {},
   methods: {
+    errorSound() {
+      const audio = this.$refs.erroraudio
+      // Unmute the audio before playing
+      audio.muted = false
+      // Play the audio
+      audio.play()
+      // Stop the audio after 1 second
+      setTimeout(() => {
+        if (!audio.paused) {
+          audio.pause()
+          audio.currentTime = 0
+        } else {
+          audio.currentTime = 0
+        }
+      }, 1200)
+    },
+    successSound() {
+      const audio = this.$refs.sucessaudio
+      // Unmute the audio before playing
+      audio.muted = false
+      // Play the audio
+      audio.play()
+      // Stop the audio after 1 second
+      setTimeout(() => {
+        if (!audio.paused) {
+          audio.pause()
+          audio.currentTime = 0
+        } else {
+          audio.currentTime = 0
+        }
+      }, 1200)
+    },
     change() {
       // const asciiValues = [];
       // for (let i = 0; i < this.scannerData.length; i++) {
@@ -358,20 +400,19 @@ export default {
       console.log('today1', today1)
       console.log('today2', today2)
       console.log('today3', today3)
-      alert(scanValue.slice(0, 7))
       if (scanValue.slice(0, 7) === '[)>{RS}') {
         const datas = scanValue.split('{GS}')
-        alert(datas)
         for (const a of datas) {
           if (a.slice(0, 1) === 'P') {
             PRD_ITMNO = a.slice(1)
             PALLET_ITMNO = this.pinput.TMP_ITMNO.replace('-', '')
             // 제품아이템번호가 파렛트 아이템번호와 같은지 체크
             if (PRD_ITMNO !== PALLET_ITMNO) {
+              this.$refs.errorbutton.click()
               alert(
                 'No ITMNO Match - product itmno is different from pallet itmno'
               )
-              this.refresh()
+              location.reload()
               return
             }
           } else if (a.slice(0, 1) === 'S') {
@@ -389,8 +430,9 @@ export default {
                 PRD_CODE
               ])
             ) {
+              this.$refs.errorbutton.click()
               alert('ALC Code Error - please check Product ALC Code')
-              this.refresh()
+              location.reload()
               return
             }
           } else if (a.slice(0, 1) === 'T') {
@@ -399,8 +441,9 @@ export default {
         }
         const productNO = PRD_ALC + PRD_NO
         if (await this.chkprdno(productNO)) {
+          this.$refs.errorbutton.click()
           alert('Duplicate - this product already scanned')
-          this.refresh()
+          location.reload()
           return
         }
         await this.insertproduct([
@@ -410,9 +453,13 @@ export default {
           PRD_ITMNO,
           today2
         ])
-        this.refresh()
+        this.$refs.successbutton.click()
+        setTimeout(() => {
+          location.reload()
+        }, 1200)
       } else {
-        alert('Label Error - please check product label')
+        this.$refs.errorbutton.click()
+        alert('Label Error - please check product label format')
         console.log('no', this.pscanValue.slice(0, 7))
         location.reload()
       }

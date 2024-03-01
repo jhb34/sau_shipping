@@ -91,17 +91,18 @@
         </div>
       </div>
       <div class="music-player">
-        <audio ref="erroraudio" muted>
-          <source src="../assets/sounds/error.mp3" />
-        </audio>
-        <div
-          @click="errorSound"
-          ref="errorbutton"
-          class="toggle-sound paused"
-        ></div>
+        <audio ref="erroraudio" src="/error.mp3" muted></audio>
+        <audio ref="sucessaudio" src="/success.mp3" muted></audio>
+        <button type="button" @click="errorSound" ref="errorbutton">
+          Play Error
+        </button>
+        <button type="button" @click="successSound" ref="successbutton">
+          Play Success
+        </button>
       </div>
       <div class="input-group mt-2">
         <button
+          type="button"
           class="btn btn-primary col-3"
           style="font-size: 2vh"
           @click="getData"
@@ -115,7 +116,7 @@
         style="height: 65vh; overflow: auto"
       >
         <table class="table table-hover">
-          <thead class="table-primary">
+          <thead class="table-dark">
             <tr style="position: sticky; top: 0">
               <th>Date</th>
               <th>Customer</th>
@@ -156,6 +157,7 @@
   </div>
 </template>
 <script>
+// import { Howl } from 'howler'
 export default {
   components: {},
   data() {
@@ -185,14 +187,35 @@ export default {
   methods: {
     errorSound() {
       const audio = this.$refs.erroraudio
-      this.playing = !this.playing
-      if (this.playing) {
-        this.$refs.erroraudio.muted = false
-        audio.play()
-        this.playing = !this.playing
-      } else {
-        audio.pause()
-      }
+      // Unmute the audio before playing
+      audio.muted = false
+      // Play the audio
+      audio.play()
+      // Stop the audio after 1 second
+      setTimeout(() => {
+        if (!audio.paused) {
+          audio.pause()
+          audio.currentTime = 0
+        } else {
+          audio.currentTime = 0
+        }
+      }, 1200)
+    },
+    successSound() {
+      const audio = this.$refs.sucessaudio
+      // Unmute the audio before playing
+      audio.muted = false
+      // Play the audio
+      audio.play()
+      // Stop the audio after 1 second
+      setTimeout(() => {
+        if (!audio.paused) {
+          audio.pause()
+          audio.currentTime = 0
+        } else {
+          audio.currentTime = 0
+        }
+      }, 1200)
     },
     setDate() {
       let a = ''

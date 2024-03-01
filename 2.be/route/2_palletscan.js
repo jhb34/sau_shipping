@@ -123,6 +123,8 @@ router.post("/updatecontainer", (req, res) => {
   console.log(params);
   const con = params[0];
   const selectd = params[1];
+  console.log(con);
+  console.log(selectd);
   // const scanbox = params[2];
   // const today3 = params[3];
   // const code = params[4];

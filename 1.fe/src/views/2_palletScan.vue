@@ -9,7 +9,7 @@
   >
     <div
       style="
-        background-color: #067dd7;
+        background-color: #940b0b;
         color: azure;
         height: 6vh;
         font-size: 3vh;
@@ -44,14 +44,14 @@
         </div>
       </div>
       <div class="music-player">
-        <audio ref="erroraudio" muted>
-          <source src="../assets/sounds/error.mp3" />
-        </audio>
-        <div
-          @click="errorSound"
-          ref="errorbutton"
-          class="toggle-sound paused"
-        ></div>
+        <audio ref="erroraudio" src="/error.mp3" muted></audio>
+        <audio ref="sucessaudio" src="/success.mp3" muted></audio>
+        <button type="button" @click="errorSound" ref="errorbutton">
+          Play Error
+        </button>
+        <button type="button" @click="successSound" ref="successbutton">
+          Play Success
+        </button>
       </div>
       <div class="input-group mt-1">
         <span class="input-group-text col-4 text-center" style="font-size: 3vh"
@@ -91,7 +91,7 @@
       </div>
       <div class="mt-2" style="height: 65vh; overflow: auto">
         <table class="table table-hover">
-          <thead class="table-primary">
+          <thead class="table-dark">
             <tr style="position: sticky; top: 0">
               <th>ASN</th>
               <th>Item</th>
@@ -182,17 +182,35 @@ export default {
   methods: {
     errorSound() {
       const audio = this.$refs.erroraudio
-      this.playing = !this.playing
-      if (this.playing) {
-        this.$refs.erroraudio.muted = false
-        audio.play()
-        this.playing = !this.playing
-      } else {
-        audio.pause()
-      }
-      // const sound = new Audio('/error.mp3')
-      // console.log(sound)
-      // sound.play()
+      // Unmute the audio before playing
+      audio.muted = false
+      // Play the audio
+      audio.play()
+      // Stop the audio after 1 second
+      setTimeout(() => {
+        if (!audio.paused) {
+          audio.pause()
+          audio.currentTime = 0
+        } else {
+          audio.currentTime = 0
+        }
+      }, 1200)
+    },
+    successSound() {
+      const audio = this.$refs.sucessaudio
+      // Unmute the audio before playing
+      audio.muted = false
+      // Play the audio
+      audio.play()
+      // Stop the audio after 1 second
+      setTimeout(() => {
+        if (!audio.paused) {
+          audio.pause()
+          audio.currentTime = 0
+        } else {
+          audio.currentTime = 0
+        }
+      }, 1200)
     },
     async chkst() {
       this.data.forEach((a) => {
@@ -299,6 +317,7 @@ export default {
       }
       console.log('updatecontainer', r)
       if (r.status === 200) {
+        this.$refs.successbutton.click()
         alert('Container number saved')
         this.goToHome()
       }
@@ -497,6 +516,10 @@ export default {
             today3,
             1
           ])
+          this.$refs.successbutton.click()
+          setTimeout(() => {
+            location.reload()
+          }, 1200)
         } else if (
           selectedData.ORD_QTY ===
           selectedData.SCAN_QTY + tempData.TMP_QTY
@@ -509,9 +532,13 @@ export default {
             2
           ])
         }
-        location.reload()
+        this.$refs.successbutton.click()
+        setTimeout(() => {
+          location.reload()
+        }, 1200)
       } else {
-        alert('Label Error - please check pallet label')
+        this.$refs.errorbutton.click()
+        alert('Label Error - please check pallet label format')
         console.log('no', this.scanValue.slice(0, 7))
         location.reload()
       }
