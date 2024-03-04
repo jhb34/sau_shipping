@@ -9,26 +9,27 @@
   >
     <div
       style="
-        background-color: #940b0b;
-        color: azure;
+        background-color: #bae6fd;
+        color: black;
         height: 6vh;
-        font-size: 3vh;
+        font-size: 4vh;
         font-weight: 800;
-        padding: 1vh;
+        padding-bottom: 1vh;
       "
     >
       2. PALLET SCAN
+      <router-link to="/">
+        <font-awesome-icon
+          icon="fa-solid fa-house"
+          class="float-start"
+          style="height: 4vh; padding: 1vh; color: black"
+        />
+      </router-link>
       <font-awesome-icon
         icon="fa-solid fa-rotate"
         class="float-end"
-        style="height: 4vh"
+        style="height: 4vh; padding: 1vh"
         @click="refresh"
-      />
-      <font-awesome-icon
-        icon="fa-solid fa-house"
-        class="float-start"
-        @click="goToHome"
-        style="height: 4vh"
       />
     </div>
     <div class="container">
@@ -43,7 +44,7 @@
           >
         </div>
       </div>
-      <div class="music-player">
+      <div class="music-player visually-hidden">
         <audio ref="erroraudio" src="/error.mp3" muted></audio>
         <audio ref="sucessaudio" src="/success.mp3" muted></audio>
         <button type="button" @click="errorSound" ref="errorbutton">
@@ -72,8 +73,10 @@
         />
       </div>
       <div class="input-group mt-1" v-else>
-        <span class="input-group-text col-4 text-center" style="font-size: 3vh"
-          >Container No.</span
+        <span
+          class="input-group-text col-4 text-center"
+          style="font-size: 3vh; background-color: #ea580c; color: whitesmoke"
+          >Container</span
         >
         <input
           type="text"
@@ -126,8 +129,8 @@
                   >Done</span
                 >
               </td>
-              <td>{{ a.ORD_QTY }}</td>
-              <td>{{ a.SCAN_QTY }}</td>
+              <td>{{ a.ORD_BOX }}</td>
+              <td>{{ a.SCAN_BOX }}</td>
               <td>{{ a.SCAN_HM.substring(10, 19) }}</td>
               <!-- <td>
                 <span v-if="a.NOW_ST === '0'" class="badge bg-warning text-dark"

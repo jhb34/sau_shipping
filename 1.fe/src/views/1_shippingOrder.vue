@@ -9,19 +9,19 @@
   >
     <div
       style="
-        background-color: #067dd7;
-        color: azure;
+        background-color: #bae6fd;
+        color: black;
         height: 6vh;
         font-weight: 800;
-        font-size: 3vh;
-        padding: 1vh;
+        font-size: 4vh;
+        padding-bottom: 1vh;
       "
     >
       1. SHIPPING ORDER
       <font-awesome-icon
         icon="fa-solid fa-rotate"
         class="float-end"
-        style="height: 4vh"
+        style="height: 4vh; padding: 1vh"
         @click="refresh"
       />
     </div>
@@ -90,7 +90,7 @@
           </div>
         </div>
       </div>
-      <div class="music-player">
+      <div class="music-player visually-hidden">
         <audio ref="erroraudio" src="/error.mp3" muted></audio>
         <audio ref="sucessaudio" src="/success.mp3" muted></audio>
         <button type="button" @click="errorSound" ref="errorbutton">
@@ -125,7 +125,20 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="a in data" :key="a" @click="goToScan(a.TRAILER_NO)">
+            <tr
+              v-for="a in data"
+              :key="a"
+              @click="goToScan(a.TRAILER_NO)"
+              :class="[
+                a.NOW_ST === '0'
+                  ? null
+                  : a.NOW_ST === '1'
+                  ? null
+                  : a.NOW_ST === '2'
+                  ? null
+                  : 'visually-hidden'
+              ]"
+            >
               <td>{{ a.SAL_YMD }}</td>
               <td>
                 {{
@@ -137,18 +150,12 @@
                 }}
               </td>
               <td>{{ a.TRAILER_NO }}</td>
-              <td>{{ a.NOW_ST }}</td>
-              <!-- <td >
+              <td>
                 <span v-if="a.NOW_ST === '0'" class="badge bg-light text-dark"
                   >Waiting</span
                 >
-                <span
-                  v-else-if="a.NOW_ST === '2'"
-                  class="badge bg-warning text-dark"
-                  >Scanning</span
-                >
                 <span v-else class="badge bg-success">Processing</span>
-              </td> -->
+              </td>
             </tr>
           </tbody>
         </table>

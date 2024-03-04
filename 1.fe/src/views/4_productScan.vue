@@ -9,26 +9,27 @@
   >
     <div
       style="
-        background-color: #0b9422;
-        color: azure;
+        background-color: #fbcfe8;
+        color: black;
         height: 6vh;
-        font-size: 3vh;
+        font-size: 4vh;
         font-weight: 800;
-        padding: 1vh;
+        padding-bottom: 1vh;
       "
     >
       3. PRODUCT SCAN
+      <router-link to="/">
+        <font-awesome-icon
+          icon="fa-solid fa-house"
+          class="float-start"
+          style="height: 4vh; padding: 1vh; color: black"
+        />
+      </router-link>
       <font-awesome-icon
         icon="fa-solid fa-rotate"
         class="float-end"
-        style="height: 4vh"
+        style="height: 4vh; padding: 1vh"
         @click="refresh"
-      />
-      <font-awesome-icon
-        icon="fa-solid fa-house"
-        class="float-start"
-        @click="goToHome"
-        style="height: 4vh"
       />
     </div>
     <div class="container">
@@ -49,7 +50,7 @@
           <span style="font-size: 3vh">{{ pinput.TMP_SERNO }}</span>
         </div>
       </div>
-      <div class="music-player">
+      <div class="music-player visually-hidden">
         <audio ref="erroraudio" src="/error.mp3" muted></audio>
         <audio ref="sucessaudio" src="/success.mp3" muted></audio>
         <button type="button" @click="errorSound" ref="errorbutton">

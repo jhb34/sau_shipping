@@ -128,19 +128,19 @@ router.post("/updatecontainer", (req, res) => {
   // const scanbox = params[2];
   // const today3 = params[3];
   // const code = params[4];
-  // const request = new sql.Request();
-  // request.query(
-  //   `update SAL_ORDER set CONTAINER_NO='${con}',NOW_ST='3' where SAL_YMD='${selectd.date}' and TRAILER_NO='${selectd.trail}'  `,
-  //   (err, result) => {
-  //     if (err) {
-  //       console.log(err);
-  //       res.sendStatus(500);
-  //       return;
-  //     }
-  //     console.log(result);
-  //     res.send(result);
-  //   }
-  // );
+  const request = new sql.Request();
+  request.query(
+    `update SAL_ORDER set CONTAINER_NO='${con}',NOW_ST='3' where SAL_YMD='${selectd.date}' and TRAILER_NO='${selectd.trail}'  `,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+        return;
+      }
+      console.log(result);
+      res.send(result);
+    }
+  );
 });
 
 module.exports = router;
