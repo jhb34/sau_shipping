@@ -75,7 +75,7 @@
       <div class="input-group mt-1" v-else>
         <span
           class="input-group-text col-4 text-center"
-          style="font-size: 3vh; background-color: #ea580c; color: whitesmoke"
+          style="font-size: 3vh; background-color: #be123c; color: whitesmoke"
           >Container</span
         >
         <input
@@ -83,14 +83,9 @@
           class="form-control"
           v-model="containernumber"
           inputmode="numeric"
+          @keyup.enter="savecontainer"
         />
-        <button
-          class="btn btn-primary"
-          @click="savecontainer"
-          :disabled="containernumber === ''"
-        >
-          Save
-        </button>
+        <button class="btn btn-primary" @click="savecontainer">Save</button>
       </div>
       <div class="mt-2" style="height: 65vh; overflow: auto">
         <table class="table table-hover">
@@ -223,8 +218,12 @@ export default {
       })
     },
     async savecontainer() {
+      if (this.containernumber === '') {
+        this.$refs.errorbutton.click()
+        alert('Please input container number')
+        return
+      }
       const yes = confirm('Do you want to save container number?')
-      console.log(yes)
       if (yes) {
         await this.updatecontainer()
       }
