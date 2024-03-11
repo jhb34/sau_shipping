@@ -9,20 +9,20 @@
   >
     <div
       style="
-        background-color: #fbcfe8;
-        color: black;
+        background-color: #be123c;
+        color: white;
         height: 6vh;
         font-size: 4vh;
         font-weight: 800;
         padding-bottom: 1vh;
       "
     >
-      3. PRODUCT SCAN
+      3. D/Shaft SCAN
       <router-link to="/">
         <font-awesome-icon
           icon="fa-solid fa-house"
           class="float-start"
-          style="height: 4vh; padding: 1vh; color: black"
+          style="height: 4vh; padding: 1vh; color: white"
         />
       </router-link>
       <font-awesome-icon
@@ -65,9 +65,11 @@
           >Message</span
         >
         <div class="form-control">
-          <span style="font-size: 3vh">Scan&nbsp;&nbsp;&nbsp;</span>
+          <span style="font-size: 3vh">Scan&nbsp;&nbsp;</span>
           <span style="font-size: 5vh; color: red">{{ 2 - pdata.length }}</span>
-          <span style="font-size: 3vh">&nbsp;&nbsp;&nbsp;more products</span>
+          <span style="font-size: 3vh"
+            >&nbsp;&nbsp;more&nbsp;&nbsp;D/Shaft</span
+          >
         </div>
       </div>
       <div class="input-group mt-2">

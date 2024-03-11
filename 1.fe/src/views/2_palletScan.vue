@@ -46,12 +46,16 @@
       </div>
       <div class="music-player visually-hidden">
         <audio ref="erroraudio" src="/error.mp3" muted></audio>
-        <audio ref="sucessaudio" src="/success.mp3" muted></audio>
         <button type="button" @click="errorSound" ref="errorbutton">
           Play Error
         </button>
+        <audio ref="sucessaudio" src="/success.mp3" muted></audio>
         <button type="button" @click="successSound" ref="successbutton">
           Play Success
+        </button>
+        <audio ref="notiaudio" src="/noti.mp3" muted></audio>
+        <button type="button" @click="notiSound" ref="notibutton">
+          Play Noti
         </button>
       </div>
       <div class="input-group mt-1">
@@ -196,6 +200,22 @@ export default {
     },
     successSound() {
       const audio = this.$refs.sucessaudio
+      // Unmute the audio before playing
+      audio.muted = false
+      // Play the audio
+      audio.play()
+      // Stop the audio after 1 second
+      setTimeout(() => {
+        if (!audio.paused) {
+          audio.pause()
+          audio.currentTime = 0
+        } else {
+          audio.currentTime = 0
+        }
+      }, 1200)
+    },
+    notiSound() {
+      const audio = this.$refs.notiaudio
       // Unmute the audio before playing
       audio.muted = false
       // Play the audio
@@ -497,7 +517,10 @@ export default {
         }
         // 제품바코드 체크
         if (await this.isShaft([tempData, 'A'])) {
-          this.goToProduct(selectedData, tempData)
+          this.$refs.notibutton.click()
+          setTimeout(() => {
+            this.goToProduct(selectedData, tempData)
+          }, 1200)
           return
           //   this.$refs.btnModal.click()
           // if (await this.chkProduct()) {
