@@ -221,6 +221,7 @@ export default {
           today2,
           1
         ])
+        await this.updateprdtag([this.pinput.TMP_SERNO, today1])
         if (
           Number(this.pinput.ORD_QTY) >
           Number(this.pinput.SCAN_QTY) + Number(this.pinput.TMP_QTY)
@@ -336,6 +337,14 @@ export default {
         alert('Error at updateorder')
       }
       console.log('updateorder', r)
+    },
+    async updateprdtag(a) {
+      const r = await this.$post('/api/updateprdtag', { params: a })
+      if (r === undefined) {
+        alert('Error at updateprdtag')
+        return
+      }
+      console.log('updateprdtag', r)
     },
     goToHome() {
       this.$router.push({

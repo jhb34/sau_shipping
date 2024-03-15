@@ -357,6 +357,25 @@ app.post("/api/updateorder", (req, res) => {
     }
   );
 });
+app.post("/api/updateprdtag", (req, res) => {
+  const { params } = req.body;
+  console.log("updateprdtag", params);
+  const TMP_SERNO = params[0];
+  const today1 = params[1];
+  const request = new sql.Request();
+  request.query(
+    `update PRD_TAG set OUT_FLAG='${today1}' where STAG_NO='${TMP_SERNO}' `,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.sendStatus(500);
+        return;
+      }
+      console.log(result);
+      res.send(result);
+    }
+  );
+});
 // app.post("/updatecontainer", (req, res) => {
 //   const { params } = req.body;
 //   console.log(params);

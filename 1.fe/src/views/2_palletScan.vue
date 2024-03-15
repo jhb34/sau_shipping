@@ -328,6 +328,14 @@ export default {
       }
       console.log('updateorder', r)
     },
+    async updateprdtag(a) {
+      const r = await this.$post('/api/updateprdtag', { params: a })
+      if (r === undefined) {
+        alert('Error at updateprdtag')
+        return
+      }
+      console.log('updateprdtag', r)
+    },
     async updatecontainer() {
       const con = this.containernumber.trim()
       const r = await this.$post('/api/palletscan/updatecontainer', {
@@ -522,17 +530,9 @@ export default {
             this.goToProduct(selectedData, tempData)
           }, 1200)
           return
-          //   this.$refs.btnModal.click()
-          // if (await this.chkProduct()) {
-          //   console.log('hello')
-          // } else {
-          //   await this.inserthist([selectedData, tempData, today1, today2, 6])
-          //   alert('Product Barcode Error - please check product')
-          //   return
-          // }
         }
-        console.log('chk all clear')
         await this.inserthist([selectedData, tempData, today1, today2, 1])
+        await this.updateprdtag([tempData.TMP_SERNO, today1])
         if (selectedData.ORD_QTY > selectedData.SCAN_QTY + tempData.TMP_QTY) {
           await this.updateorder([
             selectedData,
